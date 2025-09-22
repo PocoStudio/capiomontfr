@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@400;700&display=swap');
+
+@keyframes rotator {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(270deg);
+  }
+}
+
+@keyframes dash {
+  0% {
+    stroke-dashoffset: 187;
+  }
+  50% {
+    stroke-dashoffset: 46.75;
+    transform: rotate(135deg);
+  }
+  100% {
+    stroke-dashoffset: 187;
+    transform: rotate(450deg);
+  }
+}
+
+@keyframes colors {
+  0% {
+    stroke: #4285F4;
+  }
+  25% {
+    stroke: #DE3E35;
+  }
+  50% {
+    stroke: #F7C223;
+  }
+  75% {
+    stroke: #1B9A59;
+  }
+  100% {
+    stroke: #4285F4;
+  }
+}
+
+.spinner {
+  animation: rotator 1.4s linear infinite;
+}
+
+.spinner-path {
+  stroke-dasharray: 187;
+  stroke-dashoffset: 0;
+  transform-origin: center;
+  animation: dash 1.4s ease-in-out infinite, colors 5.6s ease-in-out infinite;
+}
+
+/* Animation pour le texte diagonal */
+@keyframes redTransition {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.diagonal-text-effect {
+  background: linear-gradient(135deg, #333 60%, #da1640 80%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: redTransition 3s infinite alternate;
+}
+
+/* Classes pour le centrage exactement comme offline.html */
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);    
+}
+
+.inwork {
+  display: flex;
+  width: 50%; 
+  margin: 0 auto;
+  padding-left: 50px;
+}
+
+/* Media queries pour mobile comme offline.html */
+@media screen and (max-width: 700px) {
+  h1 {
+    font-size: 2.5rem;
+  }
+  
+  p {
+    font-size: 1rem;
+  }
+  
+  .inwork {
+    display: flex;
+    width: 50%; 
+    margin: 0 auto;
+    padding-left: 30px;
+  }
+}
