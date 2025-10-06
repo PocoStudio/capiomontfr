@@ -4,6 +4,7 @@ import './MaintenancePage.css'
 
 export default function MaintenancePage() {
   const [showContent, setShowContent] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -65,15 +66,113 @@ export default function MaintenancePage() {
           </p>
 
           {/* Indicateur de maintenance */}
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center gap-3">
             <div className="flex items-center bg-gray-100 border border-gray-200 rounded-full px-3 py-1.5">
               <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-2"></div>
               <span className="text-gray-700 text-sm font-medium">Maintenance en cours...</span>
+            </div>
+            
+            {/* Bulle d'information */}
+            <div className="relative">
+              <button
+                onClick={() => setShowInfo(!showInfo)}
+                className="info-button w-8 h-8 bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all duration-300"
+                aria-label="Plus d'informations"
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-4 w-4 text-gray-700" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+                  />
+                </svg>
+              </button>
+              
             </div>
           </div>
 
         </div>
       </div>
+
+      {/* Popup centré */}
+      {showInfo && (
+        <div className="popup-overlay" onClick={() => setShowInfo(false)}>
+          <div className="popup-container" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowInfo(false)}
+              className="popup-close"
+              aria-label="Fermer"
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-5 w-5" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M6 18L18 6M6 6l12 12" 
+                />
+              </svg>
+            </button>
+            
+            <div className="popup-content">
+              <div className="flex items-start gap-3 mb-6">
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-5 w-5 text-gray-600 mt-0.5 flex-shrink-0" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+                  />
+                </svg>
+                <p className="text-gray-700 leading-relaxed text-left">
+                  Le site est actuellement en reconstruction pour un changement de language de développement de Python à Node.js ainsi que de design !
+                </p>
+              </div>
+              
+              <a 
+                href="https://statuts.capiomont.fr" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="status-link"
+              >
+                <span>Voir les statuts en temps réel</span>
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-4 w-4" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" 
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
 
     </>
