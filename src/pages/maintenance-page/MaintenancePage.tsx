@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import pixelConstructGif from './assets/pixelconstruct.gif'
-import './MaintenancePage.css'
+import pixelConstructGif from '../../assets/special/maintenance-page/pixelconstruct.gif'
+import '../../styles/special/maintenance-page/style.css'
 
 export default function MaintenancePage() {
   const [showContent, setShowContent] = useState(false)
@@ -65,14 +65,12 @@ export default function MaintenancePage() {
             </a>
           </p>
 
-          {/* Indicateur de maintenance */}
           <div className="flex items-center justify-center gap-3">
             <div className="flex items-center bg-gray-100 border border-gray-200 rounded-full px-3 py-1.5">
               <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-2"></div>
               <span className="text-gray-700 text-sm font-medium">Maintenance en cours...</span>
             </div>
             
-            {/* Bulle d'information */}
             <div className="relative">
               <button
                 onClick={() => setShowInfo(!showInfo)}
@@ -101,7 +99,6 @@ export default function MaintenancePage() {
         </div>
       </div>
 
-      {/* Popup centré */}
       {showInfo && (
         <div className="popup-overlay" onClick={() => setShowInfo(false)}>
           <div className="popup-container" onClick={(e) => e.stopPropagation()}>
@@ -143,7 +140,7 @@ export default function MaintenancePage() {
                   />
                 </svg>
                 <p className="text-gray-700 leading-relaxed text-left">
-                  Le site est actuellement en reconstruction pour un changement de language de développement de Python à Node.js ainsi que de design !
+                  Le site est actuellement en reconstruction pour vous offrir une meilleure expérience. Merci de votre patience et compréhension.
                 </p>
               </div>
               

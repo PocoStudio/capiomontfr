@@ -1,51 +1,35 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirection - Capiomont</title>
-  <script>
-    // Redirection immédiate vers la page principale
-    // GitHub Pages sert automatiquement 404.html pour les routes non trouvées
-    // On redirige vers la racine qui affiche la page de maintenance
-    window.location.replace('/');
-  </script>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Red Hat Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-    .loader {
-      text-align: center;
-      color: #6b7280;
-    }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      margin: 0 auto 16px;
-      border: 3px solid #f3f4f6;
-      border-top-color: #da1640;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  </style>
-</head>
-<body>
-  <div class="loader">
-    <div class="spinner"></div>
-    <p>Redirection en cours...</p>
-  </div>
-  <noscript>
-    <meta http-equiv="refresh" content="0; url=/">
-  </noscript>
-</body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="status" content="503" />
+    <link rel="icon" type="image/png" href="/logo_base_bleu-clair-ligth_55_55.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home-Capiomont</title>
+    <script>
+      (function() {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+          if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+            var style = document.createElement('style');
+            style.innerHTML = `
+              html, body {
+                background: linear-gradient(135deg, #0f172a 0%, #020420 100%);
+              }
+            `;
+            document.head.appendChild(style);
+          }
+        } catch (e) {
+          console.error('Erreur lors de l\'application du thème initial', e);
+        }
+      })();
+    </script>
+
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
