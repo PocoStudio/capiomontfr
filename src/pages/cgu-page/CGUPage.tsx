@@ -1,6 +1,7 @@
 import { ThemeToggle } from '../../components/default/ThemeToggle';
 import { FooterCard } from '../../components/default/FooterCard';
 import { ArrowLeft } from 'lucide-react';
+import { useEffect } from 'react';
 
 const cguSections = [
   {
@@ -197,6 +198,11 @@ const cguSections = [
 
 
 export const CguPage = () => {
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="min-h-screen w-full p-4 md:p-8 lg:p-12">
       <div className="max-w-7xl mx-auto">

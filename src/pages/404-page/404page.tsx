@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import error404 from '../../assets/special/404-page/erreur404.gif';
 import { useState, useEffect } from 'react'; 
 import { motion, AnimatePresence } from 'framer-motion';
+import { ThemeToggle } from '../../components/default/ThemeToggle';
 
 export const ErrorPage = () => {
   const [showImage, setShowImage] = useState(false);
@@ -18,6 +19,9 @@ export const ErrorPage = () => {
   return (
     <div className="min-h-screen w-full p-4 md:p-8 lg:p-12 flex items-center justify-center">
       <div className="flex flex-col items-center justify-center space-y-8">
+        <div className='hidden'>
+          <ThemeToggle />
+        </div>
         
         <div 
           className="text-center cursor-pointer flex items-center justify-center"
