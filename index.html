@@ -3,11 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="status" content="503" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/logo_base_bleu-clair-ligth_55_55.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home-Capiomont</title>
-    <script type="module" crossorigin src="/assets/index-vobsZrAo.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-DyV-qGwQ.css">
+    <script>
+      (function() {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+          if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+            var style = document.createElement('style');
+            style.innerHTML = `
+              html, body {
+                background: linear-gradient(135deg, #0f172a 0%, #020420 100%);
+              }
+            `;
+            document.head.appendChild(style);
+          }
+        } catch (e) {
+          console.error('Erreur lors de l\'application du thème initial', e);
+        }
+      })();
+    </script>
+
+    <script type="module" crossorigin src="/assets/index-B3V0xbFk.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DkikG2dy.css">
   </head>
   <body>
     <div id="root"></div>
