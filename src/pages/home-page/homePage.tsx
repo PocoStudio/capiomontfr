@@ -48,7 +48,7 @@ const allProjects: CardConfig[] = [
   {
     id: 1,
     title: 'Chat en ligne',
-    description: "Une application de messagerie instantanée pour communiquer en temps réel dans un chat public.",
+    description: "Une application de messagerie instantanée pour communiquer en temps réel dans vos propres salons.",
     className: 'lg:col-span-2 lg:row-span-2 glow-purple',
     icon: <MessageSquare />,
     link: 'https://talk.capiomont.fr',
@@ -85,7 +85,7 @@ const allProjects: CardConfig[] = [
   {
     id: 5,
     title: 'FindsWorld (Concept)',
-    description: "Génère des mots français rares, vous devinez la définition, une IA valide.",
+    description: "Génère des mots français rares, vous devinez la définition. (IA Project)",
     className: 'glow-orange',
     icon: <Globe />, 
     link: undefined,

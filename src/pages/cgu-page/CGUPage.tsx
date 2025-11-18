@@ -154,7 +154,7 @@ const cguSections = [
       <>
         <p><strong>Éditeur du site :</strong> Capiomont.fr</p>
         <p><strong>Responsable de la publication :</strong> Capiomont.fr</p>
-        <p><strong>Hébergement :</strong> Synology NAS Personnel / Ionos Company</p>
+        <p><strong>Hébergement :</strong> Synology NAS Personnel / O2switch / Github Pages</p>
         <p><strong>Contact :</strong> contact@capiomont.fr</p>
         <p><strong>Statut :</strong> Capiomont.fr est édité à titre personnel et ne constitue pas une entité commerciale enregistrée. Aucun numéro SIRET n’est applicable.</p>
       </>

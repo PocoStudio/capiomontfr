@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { MenuBar } from '../../components/default/MenuBar';
 import { ThemeToggle } from '../../components/default/ThemeToggle';
 import { FooterCard } from '../../components/default/FooterCard';
@@ -12,10 +12,11 @@ import type { ToastType } from '../../components/default/ResponseToast';
 import { useTurnstile } from '../../hooks/useTurnstile';
 
 const BASE_URL = 'https://contact.api.capiomont.fr';
-// const BASE_URL = 'http://localhost:3001';
+// const BASE_URL = 'http://localhost:3001'; 
 const API_URL = `${BASE_URL}/api/v0/send-mail/contact`;
 const TURNSTILE_SITE_KEY = '0x4AAAAAAB-HDY3lGyZ5Ymsb';
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export const ContactPage = () => {
   const [selectedOption, setSelectedOption] = useState<'email' | 'form'>('form');
@@ -31,10 +32,19 @@ export const ContactPage = () => {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [statusType, setStatusType] = useState<ToastType>('success');
 
-  const { executeChallenge } = useTurnstile({
+  const formRef = useRef<HTMLDivElement>(null);
+  const emailRef = useRef<HTMLDivElement>(null);
+
+  const { executeChallenge, resetChallenge } = useTurnstile({
     sitekey: TURNSTILE_SITE_KEY,
     theme: 'auto',
   });
+
+  const scrollToTarget = (ref: React.RefObject<HTMLElement | null>) => {
+    if (ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   const showToast = (message: string, type: ToastType) => {
     setStatusMessage(message);
@@ -64,24 +74,85 @@ export const ContactPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, turnstileToken: token }),
       });
+
+      if (response.status === 429) {
+        const result = await response.json();
+        const errorMsg = result.error || '';
+        const retryAfter = response.headers.get('Retry-After');
+        const waitTime = retryAfter ? Math.ceil(parseInt(retryAfter) / 60) : 5;
+        
+        if (errorMsg.includes("Trop de requêtes depuis cette IP") || errorMsg.includes("20")) {
+          showToast(
+            "Votre IP a été bloquée (trop d'envois). Contactez-nous par <a href='mailto:contact@capiomont.fr' class='underline'>email</a>.",
+            'ipBlock'
+          );
+        } else if (errorMsg.includes("5 minutes")) {
+          showToast(
+            `Merci de patienter ${waitTime} minutes avant d'envoyer un nouveau formulaire.`,
+            'rateLimit'
+          );
+        } else if (errorMsg.includes("5 messages par jour")) {
+          showToast(
+            "Vous avez atteint la limite de 5 messages par jour. Contactez-nous par <a href='mailto:contact@capiomont.fr' class='underline'>email</a>.",
+            'rateLimit'
+          );
+        } else {
+          showToast(
+            `Trop de requêtes. Veuillez attendre ${waitTime} minute${waitTime > 1 ? 's' : ''} avant de réessayer.`,
+            'rateLimit'
+          );
+        }
+        
+        resetChallenge().catch(console.error);
+        return;
+      }
+
+      if (response.status === 403) {
+        const result = await response.json();
+        showToast(
+          result.error || "Vérification de sécurité échouée. Veuillez réessayer.",
+          'warning'
+        );
+        
+        resetChallenge().catch(console.error);
+        return;
+      }
+
       const result = await response.json();
+      
       if (response.ok) {
-        showToast("Message envoyé avec succès ! Nous vous contacterons par email dans les plus brefs délais.", 'success');
+        showToast(
+          "Message envoyé avec succès ! Nous vous contacterons par email dans les plus brefs délais.",
+          'success'
+        );
         setFormData({ nomComplet: '', email: '', sujet: '', message: '' });
+        
+        resetChallenge().catch(console.error);
       } else {
         const errorMsg = result.errors ? result.errors[0].msg : result.error;
-        if (errorMsg.includes("5 minutes")) {
-          showToast("Merci de patienter avant d'envoyer un nouveau formulaire.", 'rateLimit');
-        } else if (errorMsg.includes("5 messages par jour") || errorMsg.includes("limite journalière")) {
-          showToast("Votre IP a été bloquée (trop d'envois). Contactez-nous par <a href='mailto:contact@capiomont.fr' class='underline'>email</a>.", 'ipBlock');
-        } else if (errorMsg.includes("sécurité")) {
-          showToast("Erreur Recaptcha, veuillez réessayer.", 'warning');
+        
+        if (errorMsg && (errorMsg.includes("5 messages par jour") || errorMsg.includes("limite journalière"))) {
+          showToast(
+            "Votre IP a été bloquée (trop d'envois). Contactez-nous par <a href='mailto:contact@capiomont.fr' class='underline'>email</a>.",
+            'ipBlock'
+          );
         } else {
-          showToast(`Erreur: ${errorMsg}. Contactez-nous par <a href='mailto:contact@capiomont.fr' class='underline'>email</a>.`, 'error');
+          showToast(
+            `Erreur: ${errorMsg}. Contactez-nous par <a href='mailto:contact@capiomont.fr' class='underline'>email</a>.`,
+            'error'
+          );
         }
+        
+        resetChallenge().catch(console.error);
       }
     } catch (error) {
-      showToast("Erreur de connexion. Contactez-nous par <a href='mailto:contact@capiomont.fr' class='underline'>email</a>.", 'error');
+      console.error('Erreur réseau:', error);
+      showToast(
+        "Erreur de connexion. Contactez-nous par <a href='mailto:contact@capiomont.fr' class='underline'>email</a>.",
+        'error'
+      );
+      
+      resetChallenge().catch(console.error);
     } finally {
       setIsLoading(false);
     }
@@ -89,17 +160,40 @@ export const ContactPage = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    
+    if (isLoading) {
+      console.log('Soumission déjà en cours, ignorée');
+      return;
+    }
+    
     setValidationErrors({});
     setStatusMessage(null);
+    
     if (!clientSideValidate()) return;
+    
     setIsLoading(true);
+    
     try {
       const token = await executeChallenge();
       await sendApiRequest(token);
     } catch (error) {
+      console.error('Erreur Turnstile:', error);
       showToast("Erreur lors de la vérification de sécurité.", 'warning');
       setIsLoading(false);
+      
+      resetChallenge().catch(console.error);
     }
+  };
+
+  const handleSelectOption = (option: 'email' | 'form') => {
+    setSelectedOption(option);
+    setTimeout(() => {
+        if (option === 'form') {
+            scrollToTarget(formRef);
+        } else {
+            scrollToTarget(emailRef);
+        }
+    }, 100); 
   };
 
   return (
@@ -122,7 +216,7 @@ export const ContactPage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
 
               <motion.button
-                onClick={() => setSelectedOption('form')}
+                onClick={() => handleSelectOption('form')}
                 className={`
                   bento-card-glass p-6 text-center relative
                   transition-colors
@@ -138,7 +232,7 @@ export const ContactPage = () => {
               </motion.button>
 
               <motion.button
-                onClick={() => setSelectedOption('email')}
+                onClick={() => handleSelectOption('email')}
                 className={`
                   bento-card-glass p-6 text-center relative
                   transition-colors
@@ -153,8 +247,6 @@ export const ContactPage = () => {
                 <p className="text-sm opacity-70 mt-1">Le moyen le plus courant.</p>
               </motion.button>
 
-
-
             </div>
           </div>
 
@@ -165,6 +257,7 @@ export const ContactPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
+                ref={emailRef}
               >
                 <div className="bento-card-glass p-6 md:p-8 flex flex-col items-center text-center">
                   <h2 className="text-2xl font-semibold mb-4 text-primary dark:text-primary">
@@ -186,11 +279,9 @@ export const ContactPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
+                ref={formRef}
               >
-
-
                 <div className="bento-card-glass p-6 md:p-8">
-
                   <div className="text-center mb-6">
                     <h2 className="text-3xl font-bold mb-2 text-primary dark:text-primary">
                       Formulaire de Contact

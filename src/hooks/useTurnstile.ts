@@ -24,7 +24,6 @@ export const useTurnstile = (config: TurnstileConfig) => {
   const currentTokenRef = useRef<string | null>(null);
   const [isReady, setIsReady] = useState(false);
 
-  // Fonction pour créer et exécuter le widget
   const createAndExecuteWidget = (): Promise<string> => {
     return new Promise((resolve, reject) => {
       if (!window.turnstile) {
@@ -44,6 +43,7 @@ export const useTurnstile = (config: TurnstileConfig) => {
           try {
             window.turnstile.remove(widgetIdRef.current);
           } catch (e) {
+            console.warn('Erreur lors de la suppression du widget:', e);
           }
         }
 
@@ -60,8 +60,10 @@ export const useTurnstile = (config: TurnstileConfig) => {
             reject(new Error('Échec de la vérification'));
           },
           'expired-callback': () => {
+            console.log('Token Turnstile expiré, régénération...');
             currentTokenRef.current = null;
-            createAndExecuteWidget();
+
+            createAndExecuteWidget().catch(console.error);
           },
         });
 
@@ -106,6 +108,7 @@ export const useTurnstile = (config: TurnstileConfig) => {
         try {
           window.turnstile.remove(widgetIdRef.current);
         } catch (e) {
+          console.warn('Erreur lors du nettoyage:', e);
         }
       }
       if (containerRef.current && containerRef.current.parentNode) {
@@ -115,15 +118,42 @@ export const useTurnstile = (config: TurnstileConfig) => {
   }, [config.sitekey, config.theme]);
 
   const executeChallenge = async (): Promise<string> => {
+
     if (currentTokenRef.current) {
       return currentTokenRef.current;
     }
-
     return createAndExecuteWidget();
+  };
+
+  const resetChallenge = async (): Promise<void> => {
+    console.log('Rafraîchissement du token Turnstile...');
+    currentTokenRef.current = null;
+    
+    if (widgetIdRef.current && window.turnstile) {
+      try {
+        window.turnstile.reset(widgetIdRef.current);
+        
+        return createAndExecuteWidget()
+          .then(() => {
+            console.log('Token Turnstile rafraîchi avec succès');
+          })
+          .catch((err) => {
+            console.error('Erreur lors du rafraîchissement:', err);
+          });
+      } catch (error) {
+        console.error('Erreur reset Turnstile:', error);
+        return createAndExecuteWidget()
+          .then(() => {
+            console.log('Widget Turnstile recréé avec succès');
+          })
+          .catch(console.error);
+      }
+    }
   };
 
   return { 
     executeChallenge, 
+    resetChallenge,
     isReady
   };
 };
